@@ -21,7 +21,7 @@ function Footer() {
                             </h2>
                         </div>
                         <p className="text-sm text-gray-400 mb-6 leading-relaxed pr-4">
-                            Pioneering sustainable agriculture since 2015. We are dedicated to providing farmers with scientifically-backed organic solutions that restore soil health and maximize yields without chemical harm.
+                            Pioneering sustainable agriculture. We are dedicated to providing farmers with scientifically-backed organic solutions that restore soil health and maximize yields without chemical harm.
                         </p>
                         <div className="flex space-x-4">
                             {/* Social placeholders */}
