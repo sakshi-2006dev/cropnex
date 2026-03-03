@@ -21,6 +21,7 @@ function Navbar() {
     const navLinks = [
         { name: "Home", path: "/" },
         { name: "Products", path: "/products" },
+        { name: "Bulk Order", path: "/bulk-order" },
         { name: "About Us", path: "/about" },
         { name: "Contact", path: "/contact" },
     ];

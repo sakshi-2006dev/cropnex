@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Products from "./pages/Products";
+import BulkOrder from "./pages/BulkOrder";
 
 // Admin Imports
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,6 +15,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminOrders from "./pages/admin/AdminOrders";
 
 // Conditional Layout Wrapper
 function AppLayout() {
@@ -28,6 +30,7 @@ function AppLayout() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="messages" element={<AdminMessages />} />
         </Route>
       </Routes>
@@ -42,6 +45,7 @@ function AppLayout() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/bulk-order" element={<BulkOrder />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>

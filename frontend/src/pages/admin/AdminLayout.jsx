@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, LogOut, ChevronRight, ShoppingBag } from 'lucide-react';
 
 function AdminLayout() {
     const navigate = useNavigate();
@@ -15,6 +15,7 @@ function AdminLayout() {
     const navLinks = [
         { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
         { name: 'Products', path: '/admin/products', icon: PackageSearch },
+        { name: 'Bulk Orders', path: '/admin/orders', icon: ShoppingBag },
         { name: 'Messages', path: '/admin/messages', icon: MessageSquareQuote },
     ];
 
@@ -46,8 +47,8 @@ function AdminLayout() {
                             key={link.name}
                             to={link.path}
                             className={`group flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-300 ${isActive(link.path)
-                                    ? 'bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10'
-                                    : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
+                                ? 'bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10'
+                                : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
                                 }`}
                         >
                             <div className="flex items-center gap-3 font-medium">
