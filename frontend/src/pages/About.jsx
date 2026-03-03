@@ -68,8 +68,8 @@ function About() {
                         <div className="w-full md:w-1/2 relative">
                             <div className="absolute inset-0 bg-primary/20 blur-3xl transform translate-x-4 translate-y-4 rounded-3xl z-0"></div>
                             <img
-                                src="https://unsplash.com/photos/dense-tropical-forest-with-lush-palm-trees-NNmomR7Ppm4"
-                                alt=""
+                                src="/images/about_us_agriculture.png"
+                                alt="Organic Agriculture Field"
                                 className="relative z-10 rounded-2xl shadow-xl w-full h-[400px] object-cover"
                             />
                         </div>
