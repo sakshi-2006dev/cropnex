@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
+import { HelmetProvider, Helmet } from "react-helmet-async";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -53,6 +53,9 @@ function AppLayout() {
 function App() {
   return (
     <HelmetProvider>
+      <Helmet>
+        <meta name="google-site-verification" content="2K7V7lJ5UXJnPN9-fl5oL6QYvCbKbn8COjfO9hFkihE" />
+      </Helmet>
       <Router>
         <AppLayout />
       </Router>
