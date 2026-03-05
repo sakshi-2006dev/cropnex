@@ -12,7 +12,7 @@ function AdminProducts() {
     const [currentProduct, setCurrentProduct] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
-        name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: ''
+        name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: '', price: ''
     });
 
     const getHeaders = () => {
@@ -47,7 +47,7 @@ function AdminProducts() {
     const handleAddNew = () => {
         setIsEditing(false);
         setCurrentProduct(null);
-        setFormData({ name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: '' });
+        setFormData({ name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: '', price: '' });
         setShowForm(true);
     };
 
@@ -60,7 +60,8 @@ function AdminProducts() {
             description: product.description || '',
             dosage: product.dosage || '',
             benefits: product.benefits ? product.benefits.join('\n') : '',
-            image: product.image || ''
+            image: product.image || '',
+            price: product.price || ''
         });
         setShowForm(true);
     };
@@ -95,7 +96,8 @@ function AdminProducts() {
 
         const formattedData = {
             ...formData,
-            benefits: formData.benefits.split('\n').map(b => b.trim()).filter(b => b)
+            benefits: formData.benefits.split('\n').map(b => b.trim()).filter(b => b),
+            price: Number(formData.price) || 0
         };
 
         try {
@@ -228,6 +230,11 @@ function AdminProducts() {
                                     </select>
                                 </div>
 
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Price (₹) *</label>
+                                    <input required type="number" min="0" step="1" name="price" value={formData.price} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" placeholder="e.g. 499" />
+                                </div>
+
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Product Description *</label>
                                     <textarea required name="description" rows="4" value={formData.description} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700 leading-relaxed resize-none" placeholder="Detailed product description..."></textarea>
@@ -288,7 +295,7 @@ function AdminProducts() {
                                         <tr>
                                             <th className="px-8 py-5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest w-2/5">Product Details</th>
                                             <th className="px-8 py-5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest w-1/5">Category</th>
-                                            <th className="px-8 py-5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest w-1/5">Dosage</th>
+                                            <th className="px-8 py-5 text-left text-xs font-bold text-gray-500 uppercase tracking-widest w-1/5">Price</th>
                                             <th className="px-8 py-5 text-right text-xs font-bold text-gray-500 uppercase tracking-widest w-1/5">Actions</th>
                                         </tr>
                                     </thead>
@@ -323,8 +330,8 @@ function AdminProducts() {
                                                         {product.category}
                                                     </span>
                                                 </td>
-                                                <td className="px-8 py-5 whitespace-nowrap text-sm text-gray-600 font-medium">
-                                                    {product.dosage}
+                                                <td className="px-8 py-5 whitespace-nowrap text-sm text-gray-600 font-bold">
+                                                    ₹{product.price?.toLocaleString() || '0'}
                                                 </td>
                                                 <td className="px-8 py-5 whitespace-nowrap text-right">
                                                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
