@@ -4,8 +4,7 @@ import axios from 'axios';
 import { CheckCircle, AlertTriangle, Package, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Replace with your backend URL in production
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Remove the hardcoded API_URL constant
 
 function BulkOrder() {
     const [products, setProducts] = useState([]);
@@ -17,7 +16,7 @@ function BulkOrder() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const { data } = await axios.get(`${API_URL}/products`);
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
                 setProducts(data);
             } catch (error) {
                 console.error("Failed to load products:", error);
@@ -68,7 +67,7 @@ function BulkOrder() {
 
         try {
             // 1. Create Order on Backend
-            const { data: orderData } = await axios.post(`${API_URL}/orders/create`, {
+            const { data: orderData } = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/create`, {
                 user,
                 items: selectedItems
             });
@@ -91,7 +90,7 @@ function BulkOrder() {
                 handler: async function (response) {
                     try {
                         // 3. Verify Payment on Backend
-                        const verifyRes = await axios.post(`${API_URL}/orders/verify`, {
+                        const verifyRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/verify`, {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
