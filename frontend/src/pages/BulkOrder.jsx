@@ -184,7 +184,7 @@ function BulkOrder() {
                                     <div key={product._id} className="flex flex-col sm:flex-row items-center gap-4 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
                                         <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0">
                                             {product.image ? (
-                                                <img src={product.image} alt={product.name} className="w-full h-full object-contain p-2" />
+                                                <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain p-2" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-400">No Img</div>
                                             )}

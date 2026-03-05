@@ -27,6 +27,8 @@ function ProductCard({ product }) {
                         transition={{ duration: 0.6 }}
                         src={imageUrl}
                         alt={product.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-contain p-4"
                     />
 
@@ -111,7 +113,7 @@ function ProductCard({ product }) {
                             </button>
 
                             <div className="h-64 sm:h-80 relative flex-shrink-0 bg-gray-100">
-                                <img src={imageUrl} alt={product.name} className="w-full h-full object-contain p-4" />
+                                <img src={imageUrl} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain p-4" />
                                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                                     <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-sm font-bold px-4 py-2 rounded-full shadow-sm capitalize border border-gray-200/50">
                                         {product.category || "Organic"}
