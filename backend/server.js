@@ -7,6 +7,7 @@ const Product = require("./models/Product");
 const Contact = require("./models/Contact");
 const Admin = require("./models/Admin");
 const Order = require("./models/Order");
+const Coupon = require("./models/Coupon");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 
@@ -70,9 +71,10 @@ const razorpay = new Razorpay({
 // Create Order (Initialize Razorpay Payment)
 app.post("/api/orders/create", async (req, res) => {
     try {
-        const { items, user } = req.body;
+        const { items, user, couponCode } = req.body;
 
         let totalAmount = 0;
+        let originalTotal = 0;
         const orderItems = [];
 
         // Validate items and calculate total from DB prices
@@ -80,22 +82,52 @@ app.post("/api/orders/create", async (req, res) => {
             const product = await Product.findById(item.productId);
             if (!product) return res.status(404).json({ message: `Product not found: ${item.name}` });
 
-            const itemTotal = product.price * item.quantity;
+            const basePrice = product.price;
+            const itemOriginalTotal = basePrice * item.quantity;
+
+            // Apply Bulk Discount from Product model
+            const bulkDiscountPercent = product.bulkDiscount || 0;
+            const discountedPrice = basePrice * (1 - (bulkDiscountPercent / 100));
+            const itemTotal = discountedPrice * item.quantity;
+
+            originalTotal += itemOriginalTotal;
             totalAmount += itemTotal;
 
             orderItems.push({
                 productId: product._id,
                 name: product.name,
-                price: product.price,
+                price: discountedPrice,
+                originalPrice: basePrice,
                 quantity: item.quantity
             });
         }
 
         if (totalAmount === 0) return res.status(400).json({ message: "Order total is 0" });
 
+        // Apply Coupon Discount
+        let finalAmount = totalAmount;
+        let appliedCoupon = null;
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
+
+            if (coupon) {
+                // Check expiry
+                if (coupon.expiresAt && new Date() > new Date(coupon.expiresAt)) {
+                    return res.status(400).json({ message: "Coupon has expired" });
+                }
+
+                appliedCoupon = couponCode;
+                const couponDiscountAmount = totalAmount * (coupon.discountPercent / 100);
+                finalAmount = totalAmount - couponDiscountAmount;
+            } else {
+                return res.status(400).json({ message: "Invalid or inactive coupon" });
+            }
+        }
+
         // Initialize Razorpay Order
         const options = {
-            amount: totalAmount * 100, // Razorpay takes amount in paise
+            amount: Math.round(finalAmount * 100), // Razorpay takes amount in paise
             currency: "INR",
             receipt: `rcpt_${Date.now()}`,
         };
@@ -106,7 +138,8 @@ app.post("/api/orders/create", async (req, res) => {
         const newOrder = new Order({
             user,
             items: orderItems,
-            totalAmount,
+            totalAmount: finalAmount,
+            couponCode: appliedCoupon,
             paymentDetails: {
                 razorpayOrderId: razorpayOrder.id,
                 status: "pending"
@@ -266,6 +299,52 @@ app.delete("/api/admin/products/:id", verifyAdmin, async (req, res) => {
 });
 
 // Start Server
+// ==========================================
+// ADMIN COUPONS MANAGEMENT
+// ==========================================
+
+// Get All Coupons
+app.get("/api/admin/coupons", verifyAdmin, async (req, res) => {
+    try {
+        const coupons = await Coupon.find().sort({ createdAt: -1 });
+        res.json(coupons);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Create Coupon
+app.post("/api/admin/coupons", verifyAdmin, async (req, res) => {
+    try {
+        const { code, discountPercent, isActive, expiresAt } = req.body;
+
+        const existing = await Coupon.findOne({ code: code.toUpperCase() });
+        if (existing) return res.status(400).json({ message: "Coupon code must be unique" });
+
+        const newCoupon = new Coupon({
+            code: code.toUpperCase(),
+            discountPercent,
+            isActive,
+            expiresAt
+        });
+
+        await newCoupon.save();
+        res.status(201).json(newCoupon);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// Delete Coupon
+app.delete("/api/admin/coupons/:id", verifyAdmin, async (req, res) => {
+    try {
+        await Coupon.findByIdAndDelete(req.params.id);
+        res.json({ message: "Coupon deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

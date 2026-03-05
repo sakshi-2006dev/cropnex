@@ -11,7 +11,8 @@ const productSchema = new mongoose.Schema({
     dosage: { type: String, required: true },
     benefits: { type: [String], default: [] },
     image: { type: String, default: '' },
-    price: { type: Number, default: 499 }, // Default cost in INR for trial purposes
+    price: { type: Number, default: 0 },
+    bulkDiscount: { type: Number, default: 0, min: 0, max: 100 },
     createdAt: { type: Date, default: Date.now }
 });
 

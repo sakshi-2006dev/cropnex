@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, LogOut, ChevronRight, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, LogOut, ChevronRight, ShoppingBag, IndianRupee } from 'lucide-react';
 
 function AdminLayout() {
     const navigate = useNavigate();
@@ -14,7 +14,8 @@ function AdminLayout() {
 
     const navLinks = [
         { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-        { name: 'Products', path: '/admin/products', icon: PackageSearch },
+        { name: 'Products Catalog', path: '/admin/products', icon: PackageSearch },
+        { name: 'Pricing & Offers', path: '/admin/pricing', icon: IndianRupee },
         { name: 'Bulk Orders', path: '/admin/orders', icon: ShoppingBag },
         { name: 'Messages', path: '/admin/messages', icon: MessageSquareQuote },
     ];

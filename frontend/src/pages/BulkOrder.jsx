@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
-import { CheckCircle, AlertTriangle, Package, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Package, Loader2, Tag, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Remove the hardcoded API_URL constant
@@ -12,6 +12,11 @@ function BulkOrder() {
     const [user, setUser] = useState({ name: '', email: '', phone: '', address: '' });
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null); // 'success' or 'error'
+
+    // Pricing & Coupon State
+    const [couponInput, setCouponInput] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponStatus, setCouponStatus] = useState({ loading: false, error: null, success: null });
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -40,10 +45,43 @@ function BulkOrder() {
         }));
     };
 
-    const totalAmount = products.reduce((total, product) => {
+    const { originalTotal, totalAfterBulk, finalTotal } = products.reduce((acc, product) => {
         const quantity = cart[product._id] || 0;
-        return total + (product.price * quantity);
-    }, 0);
+        if (quantity === 0) return acc;
+
+        const basePrice = product.price;
+        const bulkDiscountFactor = 1 - ((product.bulkDiscount || 0) / 100);
+
+        acc.originalTotal += (basePrice * quantity);
+        acc.totalAfterBulk += (basePrice * bulkDiscountFactor * quantity);
+
+        return acc;
+    }, { originalTotal: 0, totalAfterBulk: 0, finalTotal: 0 });
+
+    const finalCalculatedTotal = appliedCoupon ?
+        totalAfterBulk * (1 - (appliedCoupon.discountPercent / 100)) :
+        totalAfterBulk;
+
+    const totalDiscountAmount = originalTotal - finalCalculatedTotal;
+
+    const validateCoupon = async () => {
+        if (!couponInput.trim()) return;
+        setCouponStatus({ loading: true, error: null, success: null });
+        try {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/validate-coupon`, { code: couponInput });
+            if (data.valid) {
+                setAppliedCoupon({ code: couponInput.toUpperCase(), discountPercent: data.discountPercent });
+                setCouponStatus({ loading: false, error: null, success: data.message });
+            }
+        } catch (error) {
+            setAppliedCoupon(null);
+            setCouponStatus({
+                loading: false,
+                success: null,
+                error: error.response?.data?.message || 'Invalid coupon code'
+            });
+        }
+    };
 
     const handleCheckout = async (e) => {
         e.preventDefault();
@@ -69,7 +107,8 @@ function BulkOrder() {
             // 1. Create Order on Backend
             const { data: orderData } = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/create`, {
                 user,
-                items: selectedItems
+                items: selectedItems,
+                couponCode: appliedCoupon?.code
             });
 
             if (!orderData.success) {
@@ -231,15 +270,55 @@ function BulkOrder() {
                         </div>
 
                         <div className="border-t border-gray-100 pt-6">
-                            <div className="flex justify-between items-center mb-6">
-                                <span className="font-semibold text-gray-600">Total Amount</span>
-                                <span className="text-2xl font-bold text-gray-900">₹{totalAmount.toLocaleString('en-IN')}</span>
+                            {/* Coupon Section */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Discount Code</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={couponInput}
+                                        onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                                        disabled={!!appliedCoupon || couponStatus.loading || finalTotal === 0}
+                                        className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary disabled:bg-gray-50 uppercase font-mono font-bold transition-all"
+                                        placeholder="e.g. SUMMER20"
+                                    />
+                                    {appliedCoupon ? (
+                                        <button type="button" onClick={() => { setAppliedCoupon(null); setCouponInput(''); setCouponStatus({ success: null, error: null, loading: false }) }} className="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors">
+                                            <X size={20} />
+                                        </button>
+                                    ) : (
+                                        <button type="button" onClick={validateCoupon} disabled={!couponInput || couponStatus.loading || finalTotal === 0} className="px-4 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 disabled:bg-gray-300 transition-colors flex items-center justify-center min-w-[100px]">
+                                            {couponStatus.loading ? <Loader2 className="animate-spin" size={20} /> : 'Apply'}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {couponStatus.error && <p className="text-red-500 text-sm mt-2 font-medium flex items-center gap-1"><AlertTriangle size={14} /> {couponStatus.error}</p>}
+                                {couponStatus.success && <p className="text-green-600 text-sm mt-2 font-bold flex items-center gap-1"><CheckCircle size={14} /> {couponStatus.success}</p>}
+                            </div>
+
+                            {/* Order Value Breakdown */}
+                            <div className="mb-6 space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <div className="flex justify-between items-center text-sm font-medium text-gray-500">
+                                    <span>Subtotal</span>
+                                    <span>₹{originalTotal.toLocaleString('en-IN')}</span>
+                                </div>
+                                {totalDiscountAmount > 0 && (
+                                    <div className="flex justify-between items-center text-sm font-bold text-green-600">
+                                        <span className="flex items-center gap-1"><Tag size={14} /> Total Savings</span>
+                                        <span>-₹{totalDiscountAmount.toLocaleString('en-IN')}</span>
+                                    </div>
+                                )}
+                                <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
+                                    <span className="font-bold text-gray-700 text-lg">Final Total</span>
+                                    <span className="text-3xl font-extrabold text-primary">₹{finalCalculatedTotal.toLocaleString('en-IN')}</span>
+                                </div>
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={totalAmount === 0 || loading}
-                                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-glow ${totalAmount === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none' : 'bg-primary text-white hover:bg-primary-dark'}`}
+                                disabled={finalCalculatedTotal === 0 || loading}
+                                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-glow ${finalCalculatedTotal === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none' : 'bg-primary text-white hover:bg-primary-dark'}`}
                             >
                                 {loading ? <Loader2 className="animate-spin" size={20} /> : 'Proceed to Payment securely'}
                             </button>
