@@ -16,7 +16,7 @@ function AdminPricing() {
     const [showCouponForm, setShowCouponForm] = useState(false);
     const [couponForm, setCouponForm] = useState({ code: '', discountPercent: '', expiresAt: '' });
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:5000/api';
     const getHeaders = () => ({
         headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
     });
