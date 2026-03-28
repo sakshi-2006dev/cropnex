@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Edit2, Trash2, Package, Search, Image as ImageIcon } from 'lucide-react';
+import { Plus, X, Edit2, Trash2, Package, Search, Image as ImageIcon, QrCode, Download, ExternalLink } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 function AdminProducts() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // QR Modal State
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [qrValue, setQrValue] = useState('');
+    const [qrProductName, setQrProductName] = useState('');
+
     // Form State
     const [isEditing, setIsEditing] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
-        name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: ''
+        name: '', 
+        category: 'fertilizers', 
+        company: '',
+        description: '', 
+        usagePerAcre: '',
+        dosage: '', 
+        benefits: '', 
+        contactName: '',
+        phone: '',
+        image: ''
     });
 
     const getHeaders = () => {
@@ -47,7 +62,18 @@ function AdminProducts() {
     const handleAddNew = () => {
         setIsEditing(false);
         setCurrentProduct(null);
-        setFormData({ name: '', category: 'fertilizers', description: '', dosage: '', benefits: '', image: '' });
+        setFormData({ 
+            name: '', 
+            category: 'fertilizers', 
+            company: 'Cropnex',
+            description: '', 
+            usagePerAcre: '',
+            dosage: '', 
+            benefits: '', 
+            contactName: '',
+            phone: '',
+            image: '' 
+        });
         setShowForm(true);
     };
 
@@ -57,12 +83,33 @@ function AdminProducts() {
         setFormData({
             name: product.name || '',
             category: product.category || 'fertilizers',
+            company: product.company || '',
             description: product.description || '',
+            usagePerAcre: product.usagePerAcre || '',
             dosage: product.dosage || '',
             benefits: product.benefits ? product.benefits.join('\n') : '',
+            contactName: product.contactName || '',
+            phone: product.phone || '',
             image: product.image || ''
         });
         setShowForm(true);
+    };
+
+    const handleShowQR = (product) => {
+        const url = `${window.location.origin}/p/${product._id}`;
+        setQrValue(url);
+        setQrProductName(product.name);
+        setShowQRModal(true);
+    };
+
+    const downloadQR = () => {
+        const canvas = document.getElementById('product-qr-canvas');
+        if (!canvas) return;
+        const url = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.download = `QR-${qrProductName.replace(/\s+/g, '-').toLowerCase()}.png`;
+        link.href = url;
+        link.click();
     };
 
     const handleDelete = async (id) => {
@@ -220,6 +267,11 @@ function AdminProducts() {
                                 </div>
 
                                 <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Company</label>
+                                    <input type="text" name="company" value={formData.company} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" placeholder="e.g. Cropnex Fourson" />
+                                </div>
+
+                                <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Category *</label>
                                     <select name="category" value={formData.category} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900 appearance-none">
                                         <option value="fertilizers">Organic Fertilizers</option>
@@ -228,14 +280,24 @@ function AdminProducts() {
                                     </select>
                                 </div>
 
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Product Description *</label>
-                                    <textarea required name="description" rows="4" value={formData.description} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-700 leading-relaxed resize-none" placeholder="Detailed product description..."></textarea>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Usage Per Acre</label>
+                                    <input type="text" name="usagePerAcre" placeholder="e.g. 500ml per acre" value={formData.usagePerAcre} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Recommended Dosage *</label>
-                                    <input required type="text" name="dosage" placeholder="e.g. 5 Liters per Acre" value={formData.dosage} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" />
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Legacy Dosage (Reference)</label>
+                                    <input type="text" name="dosage" placeholder="e.g. 5 Liters per Acre" value={formData.dosage} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Contact Name</label>
+                                    <input type="text" name="contactName" placeholder="e.g. Mr. Sarthak" value={formData.contactName} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Phone Number</label>
+                                    <input type="text" name="phone" placeholder="e.g. +91 9876543210" value={formData.phone} onChange={handleInputChange} className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-900" />
                                 </div>
 
                                 <div>
@@ -329,6 +391,13 @@ function AdminProducts() {
                                                 <td className="px-8 py-5 whitespace-nowrap text-right">
                                                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
+                                                            onClick={() => handleShowQR(product)}
+                                                            className="p-2 text-gray-400 hover:text-secondary-dark hover:bg-secondary/10 rounded-lg transition-colors"
+                                                            title="Generate QR Code"
+                                                        >
+                                                            <QrCode size={18} />
+                                                        </button>
+                                                        <button
                                                             onClick={() => handleEdit(product)}
                                                             className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                                                             title="Edit Product"
@@ -363,6 +432,76 @@ function AdminProducts() {
                                 </table>
                             </div>
                         )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* QR Code Modal */}
+            <AnimatePresence>
+                {showQRModal && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl overflow-hidden relative"
+                        >
+                            <div className="absolute top-0 right-0 p-6">
+                                <button onClick={() => setShowQRModal(false)} className="p-2 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="text-center mt-4">
+                                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl text-primary mb-4">
+                                    <QrCode size={32} />
+                                </div>
+                                <h3 className="text-2xl font-black font-heading text-gray-900 mb-1">Product QR Code</h3>
+                                <p className="text-gray-500 font-medium mb-8">{qrProductName}</p>
+
+                                <div className="bg-white p-6 rounded-3xl border-2 border-dashed border-gray-100 inline-block shadow-inner mb-8">
+                                    <QRCodeCanvas 
+                                        id="product-qr-canvas"
+                                        value={qrValue} 
+                                        size={200}
+                                        level={"H"}
+                                        includeMargin={false}
+                                        imageSettings={{
+                                            src: "/sprout-icon.png", // Fallback or placeholder
+                                            x: undefined,
+                                            y: undefined,
+                                            height: 40,
+                                            width: 40,
+                                            excavate: true,
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button 
+                                        onClick={downloadQR}
+                                        className="flex items-center justify-center gap-2 bg-gray-900 text-white font-bold py-3 px-4 rounded-2xl hover:bg-black transition-all shadow-lg active:scale-95"
+                                    >
+                                        <Download size={18} /> Download
+                                    </button>
+                                    <button 
+                                        onClick={() => window.open(qrValue, '_blank')}
+                                        className="flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-2xl hover:bg-primary-dark transition-all shadow-lg active:scale-95"
+                                    >
+                                        <ExternalLink size={18} /> Open Page
+                                    </button>
+                                </div>
+                                
+                                <p className="mt-6 text-xs text-gray-400 font-bold uppercase tracking-widest break-all">
+                                    {qrValue}
+                                </p>
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

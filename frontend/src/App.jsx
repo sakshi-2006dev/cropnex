@@ -15,6 +15,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMessages from "./pages/admin/AdminMessages";
 
+// New Standalone Page
+import ProductInfoPage from "./pages/ProductInfoPage";
+
 // Conditional Layout Wrapper
 function AppLayout() {
   const location = useLocation();
@@ -43,6 +46,7 @@ function AppLayout() {
           <Route path="/about" element={<About />} />
           <Route path="/products" element={<Products />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/p/:id" element={<ProductInfoPage />} />
         </Routes>
       </main>
       <Footer />
