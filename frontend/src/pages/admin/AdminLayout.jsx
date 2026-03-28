@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Leaf, PackageSearch, MessageSquareQuote, Settings, LogOut, ChevronRight } from 'lucide-react';
 
 function AdminLayout() {
     const navigate = useNavigate();
@@ -16,6 +16,7 @@ function AdminLayout() {
         { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
         { name: 'Products', path: '/admin/products', icon: PackageSearch },
         { name: 'Messages', path: '/admin/messages', icon: MessageSquareQuote },
+        { name: 'Settings', path: '/admin/settings', icon: Settings },
     ];
 
     const isActive = (path) => location.pathname === path;

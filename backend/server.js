@@ -148,6 +148,30 @@ app.delete("/api/admin/products/:id", verifyAdmin, async (req, res) => {
     }
 });
 
+// Change Password
+app.put("/api/admin/change-password", verifyAdmin, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const admin = await Admin.findOne({ username: req.user.username });
+
+        if (!admin) {
+            return res.status(404).json({ message: "Admin not found" });
+        }
+
+        const isMatch = await admin.matchPassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Incorrect current password" });
+        }
+
+        admin.password = newPassword;
+        await admin.save();
+
+        res.json({ message: "Password changed successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error changing password" });
+    }
+});
+
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

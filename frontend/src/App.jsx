@@ -14,6 +14,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 // New Standalone Page
 import ProductInfoPage from "./pages/ProductInfoPage";
@@ -32,6 +33,7 @@ function AppLayout() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="messages" element={<AdminMessages />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     );
