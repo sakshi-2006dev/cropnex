@@ -149,26 +149,16 @@ function ProductInfoPage() {
                     </ul>
                 </section>
 
-                {/* Contact Footer */}
-                <section className="pt-8 mt-12 border-t-4 border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="flex items-center gap-4 bg-primary text-white p-6 rounded-3xl shadow-glow">
+                {/* Simplified Contact Footer */}
+                <section className="pt-8 mt-12 border-t-4 border-gray-100 flex justify-center">
+                    <div className="flex items-center gap-4 bg-primary text-white p-6 md:px-12 rounded-3xl shadow-glow">
                         <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                            <User size={28} />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Contact:</p>
-                            <p className="text-xl font-heading font-black">{product.contactName || "Agricultural Expert"}</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 bg-secondary text-yellow-900 p-6 rounded-3xl shadow-glow">
-                        <div className="w-12 h-12 bg-black/10 rounded-2xl flex items-center justify-center flex-shrink-0">
                             <Phone size={28} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Phone:</p>
-                            <a href={`tel:${product.phone}`} className="text-xl font-heading font-black hover:underline transition-all">
-                                {product.phone || "Contact via Head Office"}
+                            <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Contact:</p>
+                            <a href={`tel:${product.phone}`} className="text-xl md:text-2xl font-heading font-black hover:underline transition-all">
+                                {product.phone || "Contact Cropnex"}
                             </a>
                         </div>
                     </div>
