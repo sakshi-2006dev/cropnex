@@ -464,19 +464,20 @@ function AdminProducts() {
                                 <h3 className="text-2xl font-black font-heading text-gray-900 mb-1">Product QR Code</h3>
                                 <p className="text-gray-500 font-medium mb-8">{qrProductName}</p>
 
-                                <div className="bg-white p-6 rounded-3xl border-2 border-dashed border-gray-100 inline-block shadow-inner mb-8">
+                                <div className="bg-white p-4 rounded-3xl border-2 border-gray-100 inline-block shadow-inner mb-8 overflow-hidden">
                                     <QRCodeCanvas 
                                         id="product-qr-canvas"
                                         value={qrValue} 
-                                        size={200}
+                                        size={1024}
                                         level={"H"}
-                                        includeMargin={false}
+                                        includeMargin={true}
+                                        style={{ width: '256px', height: '256px', display: 'block' }}
                                         imageSettings={{
-                                            src: "/sprout-icon.png", // Fallback or placeholder
+                                            src: "/cropnex-badge.png", // Use a clean branding icon if available
                                             x: undefined,
                                             y: undefined,
-                                            height: 40,
-                                            width: 40,
+                                            height: 128,
+                                            width: 128,
                                             excavate: true,
                                         }}
                                     />
