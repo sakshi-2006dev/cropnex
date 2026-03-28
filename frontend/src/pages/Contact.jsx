@@ -112,15 +112,6 @@ function Contact() {
                             </div>
                         </motion.div>
 
-                        <motion.div whileHover={{ x: 5 }} className="flex items-start group">
-                            <div className="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center text-secondary mr-5 group-hover:bg-secondary group-hover:text-primary-dark transition-all duration-300 shadow-inner flex-shrink-0 border border-white/20">
-                                <Mail size={24} strokeWidth={2} />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-white/50 uppercase tracking-widest text-[11px] mb-2">Electronic Mail</h4>
-                                <p className="font-medium text-base leading-tight mb-2 hover:text-secondary transition-colors cursor-pointer">sakshibgadakh2006@gmail.com</p>
-                            </div>
-                        </motion.div>
 
                         <motion.div whileHover={{ x: 5 }} className="flex items-start group">
                             <div className="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center text-secondary mr-5 group-hover:bg-secondary group-hover:text-primary-dark transition-all duration-300 shadow-inner flex-shrink-0 border border-white/20">
