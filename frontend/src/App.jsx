@@ -14,7 +14,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminMessages from "./pages/admin/AdminMessages";
-import AdminSettings from "./pages/admin/AdminSettings";
+import AdminSettings from "./pages/admin/SettingsPage";
 
 // New Standalone Page
 import ProductInfoPage from "./pages/ProductInfoPage";
